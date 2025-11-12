@@ -1,0 +1,8 @@
+{
+  "csp": {
+    "resource_domains": [
+      "https://pub-d9760dbd87764044a85486be2fdf7f9f.r2.dev"
+    ],
+    "connect_domains": []
+  }
+}
