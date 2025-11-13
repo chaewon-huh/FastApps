@@ -278,6 +278,9 @@ export default function ShopWidget() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   // Force the scroll effect to rerun whenever a new carousel DOM node is mounted
   const [scrollContainerVersion, setScrollContainerVersion] = useState(0);
+  // Responsive column count for grid
+  const [columnCount, setColumnCount] = useState(2);
+  const [isMobile, setIsMobile] = useState(false);
 
   const handleScrollContainerRef = useCallback((node: HTMLDivElement | null) => {
     if (scrollContainerRef.current === node) {
@@ -298,10 +301,6 @@ export default function ShopWidget() {
     const estimated = Math.floor(clientWidth / 256);
     return Math.max(1, estimated);
   }, [isMobile]);
-
-  // Responsive column count for grid
-  const [columnCount, setColumnCount] = useState(2);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
