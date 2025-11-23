@@ -50,7 +50,7 @@ function AlbumsCarousel({ albums, onSelect }) {
   }
 
   return (
-    <div className="antialiased relative w-full text-black dark:text-white py-5 select-none">
+    <div className="antialiased relative w-full text-default py-5 select-none">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex gap-5 items-stretch">
           {normalizedAlbums.map((album, i) => (
@@ -142,9 +142,9 @@ function {ClassName}Inner() {
   return (
     <div
       className={
-        "relative antialiased w-full text-black dark:text-white " +
+        "relative antialiased w-full text-default " +
         (isFullscreen
-          ? "bg-white"
+          ? "bg-surface"
           : "bg-transparent overflow-hidden")
       }
       style={{

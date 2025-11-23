@@ -2,6 +2,7 @@ import React from "react";
 import { AppsSDKUIProvider } from "@openai/apps-sdk-ui/components/AppsSDKUIProvider";
 import { Button } from "@openai/apps-sdk-ui/components/Button";
 import { EmptyMessage } from "@openai/apps-sdk-ui/components/EmptyMessage";
+import { Image } from "@openai/apps-sdk-ui/components/Image";
 import { useWidgetProps } from "fastapps";
 import { PlusCircle, Star } from "lucide-react";
 import "./index.css";
@@ -29,7 +30,7 @@ function {ClassName}Inner() {
             </Button>
           </div>
         </div>
-        <ol className="min-w-full text-sm flex flex-col divide-y divide-subtle">
+        <ol className="min-w-full text-sm flex flex-col divide-y divide-default">
           {normalizedItems.map((item, i) => {
             const rank = i + 1;
             const infoText = item?.info || "–";
@@ -40,7 +41,7 @@ function {ClassName}Inner() {
                     {rank}
                   </div>
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <img
+                    <Image
                       src={item?.thumbnail || "https://via.placeholder.com/44"}
                       alt={item?.name || `Item ${rank}`}
                       className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring-1 ring-default"

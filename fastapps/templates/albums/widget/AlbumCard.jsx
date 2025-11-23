@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@openai/apps-sdk-ui/components/Button";
+import { Image } from "@openai/apps-sdk-ui/components/Image";
 
 function AlbumCard({ album, onSelect }) {
   if (!album) return null;
@@ -18,16 +19,18 @@ function AlbumCard({ album, onSelect }) {
       aria-label={`Open ${title}`}
       block
     >
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-card bg-surface">
-        <img
+      <div className="w-full overflow-hidden rounded-2xl shadow-card bg-surface">
+        <Image
           src={album.cover}
           alt={title}
-          className="h-full w-full object-cover"
+          className="w-full h-auto"
           loading="lazy"
         />
       </div>
       <div className="pt-3 px-1.5 w-full">
-        <div className="text-base font-medium truncate text-foreground">{title}</div>
+        <div className="text-base font-medium truncate text-foreground">
+          {title}
+        </div>
         <div className="text-sm text-secondary mt-0.5">{photoSummary}</div>
       </div>
     </Button>
