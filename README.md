@@ -205,11 +205,11 @@ uv run pytest
 
 ## License
 
-MIT © Dooi Labs
+MIT © FastApps
 
 ## Links
 
 - **PyPI**: https://pypi.org/project/fastapps/
 - **React Hooks**: https://www.npmjs.com/package/fastapps
-- **GitHub**: https://github.com/DooiLabs/FastApps
+- **GitHub**: https://github.com/FastAppsOrg/FastApps
 - **MCP Spec**: https://modelcontextprotocol.io/
