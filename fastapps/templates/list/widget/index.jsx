@@ -30,7 +30,7 @@ function {ClassName}Inner() {
             </Button>
           </div>
         </div>
-        <ol className="min-w-full text-sm flex flex-col divide-y divide-default">
+        <ol className="min-w-full text-sm flex flex-col">
           {normalizedItems.map((item, i) => {
             const rank = i + 1;
             const infoText = item?.info || "–";
@@ -44,7 +44,7 @@ function {ClassName}Inner() {
                     <Image
                       src={item?.thumbnail || "https://via.placeholder.com/44"}
                       alt={item?.name || `Item ${rank}`}
-                      className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover ring-1 ring-default"
+                      className="h-10 w-10 sm:h-11 sm:w-11 rounded-lg object-cover"
                       loading="lazy"
                     />
                     <div className="min-w-0 flex flex-col">

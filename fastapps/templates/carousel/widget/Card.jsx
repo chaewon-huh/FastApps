@@ -11,7 +11,7 @@ export default function Card({ card }) {
         <Image
           src={card.thumbnail}
           alt={card.name || card.description || "Carousel card"}
-          className="w-full aspect-square rounded-2xl object-cover ring-1 ring-default shadow-sm"
+          className="w-full aspect-square rounded-2xl object-cover shadow-sm"
         />
       </div>
       <div className="mt-3 flex flex-col flex-1">

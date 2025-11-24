@@ -31,7 +31,6 @@ export default function FullscreenViewer({ album, onBack }) {
       className="relative w-full h-full bg-surface"
       style={{
         maxHeight,
-        height: maxHeight,
       }}
     >
       {/* Back button */}

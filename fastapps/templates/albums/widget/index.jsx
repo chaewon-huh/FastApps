@@ -146,8 +146,6 @@ function {ClassName}Inner() {
         (isFullscreen ? "bg-surface" : "bg-transparent")
       }
       style={{
-        maxHeight: !isFullscreen ? maxHeight : undefined,
-        height: isFullscreen ? maxHeight : undefined,
         overflow: !isFullscreen ? "auto" : undefined,
       }}
     >
