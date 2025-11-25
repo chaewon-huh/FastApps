@@ -12,6 +12,9 @@ export { useMaxHeight } from './hooks/useMaxHeight';
 export { useMcpAppsHostContext } from './hooks/useMcpAppsHostContext';
 export { useMcpAppsToolResult } from './hooks/useMcpAppsToolResult';
 export { useMcpAppsToolInput } from './hooks/useMcpAppsToolInput';
+export { useWidgetData } from './hooks/useWidgetData';
+export { useHostContextCompat } from './hooks/useHostContextCompat';
+export { useHostActions } from './hooks/useHostActions';
 export { McpAppsClient } from './mcp/appsClient';
 
 export type {
