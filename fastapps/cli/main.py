@@ -113,7 +113,13 @@ def create(widget_name, auth, public, optional_auth, scopes, template):
     default='hosted',
     help="Widget build mode: 'hosted' (default, external JS/CSS on port 4444) or 'inline' (self-contained HTML)"
 )
-def dev(port, host, mode):
+@click.option(
+    "--protocol",
+    type=click.Choice(['openai-apps', 'mcp-apps'], case_sensitive=False),
+    default='openai-apps',
+    help="UI protocol adapter: OpenAI Apps SDK (default) or MCP Apps extension",
+)
+def dev(port, host, mode, protocol):
     """Start development server with Cloudflare Tunnel.
 
     This command will:
@@ -134,7 +140,7 @@ def dev(port, host, mode):
 
     Note: Uses Cloudflare Tunnel (free, unlimited, no sign-up required)
     """
-    start_dev_server(port=port, host=host, mode=mode)
+    start_dev_server(port=port, host=host, mode=mode, protocol=protocol)
 
 
 @cli.command()
