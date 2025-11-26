@@ -1,8 +1,8 @@
 """Auto-select protocol adapter based on host capabilities."""
 
-import logging
-
 from __future__ import annotations
+
+import logging
 
 from typing import Optional, TYPE_CHECKING
 
