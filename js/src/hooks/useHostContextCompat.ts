@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useOpenAiGlobal } from "./useOpenAiGlobal";
+import { useOpenAiGlobal } from "./useOpenaiGlobal";
 import { useMcpAppsHostContext } from "./useMcpAppsHostContext";
 
 /**

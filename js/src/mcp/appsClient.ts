@@ -73,7 +73,6 @@ export class McpAppsClient {
   private nextId: number;
   private pending: Map<number, Pending>;
   private notificationHandlers: Map<string, ((params: any) => void)[]>;
-  private initialized = false;
   private latestToolResult: any = null;
   private latestToolInput: any = null;
   private toolResultListeners: ((result: any) => void)[] = [];
@@ -103,7 +102,6 @@ export class McpAppsClient {
       clientInfo: { name: "fastapps-ui", version: "1.0.0" },
       protocolVersion: "2025-06-18",
     });
-    this.initialized = true;
     return result as UiInitializeResult;
   }
 
