@@ -8,7 +8,7 @@ from mcp import types
 
 from fastapps.core.protocol import ProtocolAdapter
 from fastapps.core.utils import get_cli_version
-from fastapps.core.adapters.utils import _inject_protocol_hint
+from fastapps.core.adapters.utils import _execute_widget_call, _inject_protocol_hint
 from fastapps.core.widget import BaseWidget, ClientContext, UserContext
 
 if TYPE_CHECKING:
@@ -129,88 +129,10 @@ class OpenAIAppsAdapter(ProtocolAdapter):
 
         async def call_tool_handler(req: types.CallToolRequest) -> types.ServerResult:
             widget = widget_server.widgets_by_id.get(req.params.name)
-            if not widget:
-                return types.ServerResult(
-                    types.CallToolResult(
-                        content=[
-                            types.TextContent(
-                                type="text", text=f"Unknown tool: {req.params.name}"
-                            )
-                        ],
-                        isError=True,
-                    )
-                )
+            result = await _execute_widget_call(widget_server, widget, req)
 
-            try:
-                access_token = None
-                if hasattr(req, "context") and hasattr(req.context, "access_token"):
-                    access_token = req.context.access_token
-                elif hasattr(req.params, "_meta"):
-                    meta_token = req.params._meta.get("access_token")
-                    if meta_token:
-                        access_token = meta_token
-
-                widget_requires_auth = getattr(widget, "_auth_required", None)
-
-                if widget_requires_auth is None and widget_server.server_requires_auth:
-                    widget_requires_auth = True
-
-                if widget_requires_auth is True and not access_token:
-                    return types.ServerResult(
-                        types.CallToolResult(
-                            content=[
-                                types.TextContent(
-                                    type="text",
-                                    text="Authentication required for this tool",
-                                )
-                            ],
-                            isError=True,
-                        )
-                    )
-
-                if (
-                    access_token
-                    and hasattr(widget, "_auth_scopes")
-                    and widget._auth_scopes
-                ):
-                    user_scopes = getattr(access_token, "scopes", [])
-                    missing_scopes = set(widget._auth_scopes) - set(user_scopes)
-
-                    if missing_scopes:
-                        return types.ServerResult(
-                            types.CallToolResult(
-                                content=[
-                                    types.TextContent(
-                                        type="text",
-                                        text=f"Missing required scopes: {', '.join(missing_scopes)}",
-                                    )
-                                ],
-                                isError=True,
-                            )
-                        )
-
-                arguments = req.params.arguments or {}
-                input_data = widget.input_schema.model_validate(arguments)
-
-                meta = req.params._meta if hasattr(req.params, "_meta") else {}
-
-                requested_locale = meta.get("openai/locale") or meta.get("webplus/i18n")
-                if requested_locale:
-                    widget.resolved_locale = widget.negotiate_locale(requested_locale)
-
-                context = ClientContext(meta)
-                user = UserContext(access_token)
-
-                result_data = await widget.execute(input_data, context, user)
-            except Exception as exc:
-                return types.ServerResult(
-                    types.CallToolResult(
-                        content=[
-                            types.TextContent(type="text", text=f"Error: {str(exc)}")
-                        ],
-                        isError=True,
-                    )
-                )
+            if isinstance(result, types.ServerResult):
+                return result
 
             widget_resource = widget.get_embedded_resource()
             meta: Dict[str, Any] = {
@@ -228,7 +150,7 @@ class OpenAIAppsAdapter(ProtocolAdapter):
             return types.ServerResult(
                 types.CallToolResult(
                     content=[types.TextContent(type="text", text=widget.invoked)],
-                    structuredContent=result_data,
+                    structuredContent=result,
                     _meta=meta,
                 )
             )

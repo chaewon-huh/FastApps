@@ -1,5 +1,7 @@
 """Auto-select protocol adapter based on host capabilities."""
 
+import logging
+
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
@@ -10,6 +12,9 @@ from fastapps.core.protocol import ProtocolAdapter
 from fastapps.core.adapters.openai_apps import OpenAIAppsAdapter
 from fastapps.core.adapters.mcp_apps import MCPAppsAdapter
 from fastapps.core.adapters.utils import _inject_protocol_hint  # type: ignore[attr-defined]
+
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from fastapps.core.server import WidgetMCPServer
@@ -75,9 +80,9 @@ class AutoProtocolAdapter(ProtocolAdapter):
             ui_ext = extensions.get("io.modelcontextprotocol/ui")
             mime_types = ui_ext.get("mimeTypes", []) if isinstance(ui_ext, dict) else []
             if any(mt.lower() == "text/html+mcp" for mt in mime_types):
-                print("[AutoAdapter] Selected MCP Apps based on client capabilities")
+                logger.info("AutoAdapter selected MCP Apps based on client capabilities")
                 return self.mcp_adapter
         except Exception:
             pass
-        print("[AutoAdapter] Selected OpenAI Apps (default)")
+        logger.info("AutoAdapter selected OpenAI Apps (default)")
         return self.openai_adapter
