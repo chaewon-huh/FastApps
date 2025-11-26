@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { McpAppsClient } from "../mcp/appsClient";
+import { useEffect, useMemo } from "react";
 
 /**
  * Host actions compatible with both OpenAI Apps and MCP Apps.
@@ -14,26 +15,29 @@ export function useHostActions(targetWindow?: Window) {
     typeof window !== "undefined"
       ? (window as any).__FASTAPPS_PROTOCOL
       : undefined;
-  const clientRef = useCallback(() => new McpAppsClient(targetWindow), [targetWindow]);
+  const client = useMemo(
+    () => McpAppsClient.getShared(targetWindow),
+    [targetWindow]
+  );
 
-  const ensureMcpClient = useCallback(() => {
-    const client = clientRef();
+  useEffect(() => {
     client.connect();
-    client.initialize().catch(() => {
-      /* ignore init errors */
+    client.initialize().catch((e) => {
+      console.warn("MCP Apps initialize failed", e);
     });
-    return client;
-  }, [clientRef]);
+    return () => {
+      client.disconnect();
+    };
+  }, [client]);
 
   const openLink = useCallback(
     async (href: string) => {
       if (protocolHint !== "mcp-apps" && window?.openai?.openExternal) {
         return window.openai.openExternal({ href });
       }
-      const client = ensureMcpClient();
       return client.sendRequest("ui/open-link", { url: href });
     },
-    [ensureMcpClient]
+    [client, protocolHint]
   );
 
   const sendMessage = useCallback(
@@ -41,13 +45,12 @@ export function useHostActions(targetWindow?: Window) {
       if (protocolHint !== "mcp-apps" && window?.openai?.sendFollowUpMessage) {
         return window.openai.sendFollowUpMessage({ prompt: text });
       }
-      const client = ensureMcpClient();
       return client.sendRequest("ui/message", {
         role: "user",
         content: { type: "text", text },
       });
     },
-    [ensureMcpClient]
+    [client, protocolHint]
   );
 
   const callTool = useCallback(
@@ -55,10 +58,9 @@ export function useHostActions(targetWindow?: Window) {
       if (protocolHint !== "mcp-apps" && window?.openai?.callTool) {
         return window.openai.callTool(name, args);
       }
-      const client = ensureMcpClient();
       return client.sendRequest("tools/call", { name, arguments: args });
     },
-    [ensureMcpClient]
+    [client, protocolHint]
   );
 
   const requestDisplayMode = useCallback(
@@ -69,7 +71,7 @@ export function useHostActions(targetWindow?: Window) {
       // No MCP Apps equivalent defined yet; return a resolved promise.
       return Promise.resolve({ mode });
     },
-    []
+    [protocolHint]
   );
 
   return {

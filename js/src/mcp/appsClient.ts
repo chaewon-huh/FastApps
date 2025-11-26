@@ -69,17 +69,38 @@ type Pending = {
 };
 
 export class McpAppsClient {
+  private static shared = new WeakMap<Window, McpAppsClient>();
   private target: Window;
+  private targetOrigin: string;
   private nextId: number;
   private pending: Map<number, Pending>;
-  private notificationHandlers: Map<string, ((params: any) => void)[]>;
-  private latestToolResult: any = null;
-  private latestToolInput: any = null;
-  private toolResultListeners: ((result: any) => void)[] = [];
-  private toolInputListeners: ((params: any) => void)[] = [];
+  private notificationHandlers: Map<string, ((params: unknown) => void)[]>;
+  private latestToolResult: unknown = null;
+  private latestToolInput: unknown = null;
+  private toolResultListeners: ((result: unknown) => void)[] = [];
+  private toolInputListeners: ((params: unknown) => void)[] = [];
+  private refCount = 0;
 
-  constructor(targetWindow?: Window) {
+  /**
+   * Get a shared client for a target window (singleton per window).
+   */
+  static getShared(targetWindow?: Window, hostOrigin?: string) {
+    const key = targetWindow ?? window.parent;
+    const existing = McpAppsClient.shared.get(key);
+    if (existing) return existing;
+    const created = new McpAppsClient(key, hostOrigin);
+    McpAppsClient.shared.set(key, created);
+    return created;
+  }
+
+  constructor(targetWindow?: Window, hostOrigin?: string) {
     this.target = targetWindow ?? window.parent;
+    // Prefer provided origin, else referrer origin, else wildcard (as last resort)
+    const referrerOrigin =
+      typeof document !== "undefined" && document.referrer
+        ? new URL(document.referrer).origin
+        : "*";
+    this.targetOrigin = hostOrigin ?? referrerOrigin ?? "*";
     this.nextId = 1;
     this.pending = new Map();
     this.notificationHandlers = new Map();
@@ -87,13 +108,19 @@ export class McpAppsClient {
   }
 
   connect() {
-    window.addEventListener("message", this.handleMessage);
+    if (this.refCount === 0) {
+      window.addEventListener("message", this.handleMessage);
+    }
+    this.refCount += 1;
   }
 
   disconnect() {
-    window.removeEventListener("message", this.handleMessage);
-    this.pending.clear();
-    this.notificationHandlers.clear();
+    this.refCount = Math.max(0, this.refCount - 1);
+    if (this.refCount === 0) {
+      window.removeEventListener("message", this.handleMessage);
+      this.pending.clear();
+      this.notificationHandlers.clear();
+    }
   }
 
   async initialize(): Promise<UiInitializeResult> {
@@ -117,7 +144,7 @@ export class McpAppsClient {
     const promise = new Promise((resolve, reject) => {
       this.pending.set(id, { resolve, reject });
       try {
-        this.target.postMessage(message, "*");
+        this.target.postMessage(message, this.targetOrigin);
       } catch (e: any) {
         this.pending.delete(id);
         reject(e);
@@ -133,20 +160,20 @@ export class McpAppsClient {
       method,
       params,
     };
-    this.target.postMessage(message, "*");
+    this.target.postMessage(message, this.targetOrigin);
   }
 
-  onNotification(method: string, handler: (params: any) => void) {
+  onNotification(method: string, handler: (params: unknown) => void) {
     const handlers = this.notificationHandlers.get(method) ?? [];
     handlers.push(handler);
     this.notificationHandlers.set(method, handlers);
   }
 
-  onToolResult(handler: (result: any) => void) {
+  onToolResult(handler: (result: unknown) => void) {
     this.toolResultListeners.push(handler);
   }
 
-  onToolInput(handler: (params: any) => void) {
+  onToolInput(handler: (params: unknown) => void) {
     this.toolInputListeners.push(handler);
   }
 

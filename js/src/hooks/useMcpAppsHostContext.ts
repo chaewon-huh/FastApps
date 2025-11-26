@@ -8,7 +8,10 @@ import { HostContext, McpAppsClient } from "../mcp/appsClient";
  * const { client, hostContext, initialized, error } = useMcpAppsHostContext();
  */
 export function useMcpAppsHostContext(targetWindow?: Window) {
-  const client = useMemo(() => new McpAppsClient(targetWindow), [targetWindow]);
+  const client = useMemo(
+    () => McpAppsClient.getShared(targetWindow),
+    [targetWindow]
+  );
   const [hostContext, setHostContext] = useState<HostContext | undefined>();
   const [initialized, setInitialized] = useState(false);
   const [error, setError] = useState<Error | null>(null);

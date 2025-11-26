@@ -6,14 +6,17 @@ import { McpAppsClient } from "../mcp/appsClient";
  * Returns the latest params of `ui/notifications/tool-result`.
  */
 export function useMcpAppsToolResult(targetWindow?: Window) {
-  const client = useMemo(() => new McpAppsClient(targetWindow), [targetWindow]);
+  const client = useMemo(
+    () => McpAppsClient.getShared(targetWindow),
+    [targetWindow]
+  );
   const [result, setResult] = useState<any>(() => client.getLatestToolResult());
 
   useEffect(() => {
     client.connect();
     // Initialize handshake so host starts sending notifications
-    client.initialize().catch(() => {
-      /* ignore init errors for now */
+    client.initialize().catch((e) => {
+      console.warn("MCP Apps initialize failed", e);
     });
 
     const handleResult = (params: any) => {
@@ -33,5 +36,5 @@ export function useMcpAppsToolResult(targetWindow?: Window) {
     };
   }, [client]);
 
-  return result;
+  return result ?? null;
 }

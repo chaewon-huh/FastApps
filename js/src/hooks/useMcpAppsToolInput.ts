@@ -6,13 +6,16 @@ import { McpAppsClient } from "../mcp/appsClient";
  * Returns the latest params of `ui/notifications/tool-input`.
  */
 export function useMcpAppsToolInput(targetWindow?: Window) {
-  const client = useMemo(() => new McpAppsClient(targetWindow), [targetWindow]);
+  const client = useMemo(
+    () => McpAppsClient.getShared(targetWindow),
+    [targetWindow]
+  );
   const [toolInput, setToolInput] = useState<any>(() => client.getLatestToolInput());
 
   useEffect(() => {
     client.connect();
-    client.initialize().catch(() => {
-      /* ignore init errors for now */
+    client.initialize().catch((e) => {
+      console.warn("MCP Apps initialize failed", e);
     });
 
     const handleInput = (params: any) => {
@@ -31,5 +34,5 @@ export function useMcpAppsToolInput(targetWindow?: Window) {
     };
   }, [client]);
 
-  return toolInput;
+  return toolInput ?? null;
 }
